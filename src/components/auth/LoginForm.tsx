@@ -3,7 +3,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { loginSchema } from '@/lib/validations';
 import {
   Form,
@@ -24,7 +23,6 @@ type LoginFormData = {
 };
 
 export function LoginForm() {
-  const router = useRouter();
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -45,7 +43,7 @@ export function LoginForm() {
         toast.error('Invalid credentials');
       } else {
         toast.success('Login successful');
-        router.push('/');
+        window.location.href = '/';
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Login failed');
