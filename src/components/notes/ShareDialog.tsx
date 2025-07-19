@@ -20,9 +20,10 @@ interface ShareDialogProps {
   noteId: string;
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void; // Callback untuk refresh data
 }
 
-export function ShareDialog({ noteId, isOpen, onClose }: ShareDialogProps) {
+export function ShareDialog({ noteId, isOpen, onClose, onSuccess }: ShareDialogProps) {
   const shareNote = useShareNote();
 
   const form = useForm({
@@ -36,11 +37,11 @@ export function ShareDialog({ noteId, isOpen, onClose }: ShareDialogProps) {
   const onSubmit = async (data: { noteId: string; email: string }) => {
     try {
       await shareNote.mutateAsync(data);
-      form.reset();
+      form.reset({ noteId, email: '' });
       onClose();
+      onSuccess?.(); // Call refresh callback
     } catch (error) {
-      // Error is handled by the hook
-      console.error('Failed to share note:', error);
+      console.error('Error sharing note:', error);
     }
   };
 
@@ -59,17 +60,26 @@ export function ShareDialog({ noteId, isOpen, onClose }: ShareDialogProps) {
                 <FormItem>
                   <FormLabel>Email Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter user email" {...field} />
+                    <Input
+                      placeholder="Enter user email"
+                      {...field}
+                      disabled={shareNote.isPending}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={shareNote.isPending}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={shareNote.isPending}>
+              <Button type="submit" disabled={shareNote.isPending || !form.watch('email')?.trim()}>
                 {shareNote.isPending ? 'Sharing...' : 'Share'}
               </Button>
             </div>

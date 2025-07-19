@@ -1,5 +1,11 @@
 import axios from 'axios';
-import { CreateNoteRequest, UpdateNoteRequest, ShareNoteRequest, Note } from '@/types/notes';
+import {
+  CreateNoteRequest,
+  UpdateNoteRequest,
+  ShareNoteRequest,
+  Note,
+  NotesResponse,
+} from '@/types/notes';
 
 const api = axios.create({
   baseURL: '/api',
@@ -11,18 +17,6 @@ interface GetNotesParams {
   filter?: string;
   page?: number;
   limit?: number;
-}
-
-interface NotesResponse {
-  notes: Note[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
 }
 
 export const notesApi = {

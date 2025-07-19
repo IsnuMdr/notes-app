@@ -1,18 +1,39 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { NoteList } from '@/components/notes/NoteLists';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { getNotesServerSide } from '@/lib/actions/note';
+import { SearchParams } from '@/types/notes';
 import { SearchAndFilter } from '@/components/common/SearchAndFilter';
+import { NoteList } from '@/components/notes/NoteList';
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const { search, filter, page, limit } = await searchParams;
+  const params = {
+    search: search || '',
+    filter: filter || 'all',
+    page,
+    limit: limit || '12',
+  };
+
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect('/login');
   }
+
+  const { notes, pagination } = await getNotesServerSide({
+    search,
+    filter,
+    page: page ? parseInt(page) : 1,
+    limit: limit ? parseInt(limit) : 12,
+  });
 
   return (
     <div className="container mx-auto py-8">
@@ -31,7 +52,7 @@ export default async function DashboardPage() {
 
       <div className="space-y-6">
         <SearchAndFilter />
-        <NoteList />
+        <NoteList notes={notes} pagination={pagination} searchParams={params} />
       </div>
     </div>
   );
