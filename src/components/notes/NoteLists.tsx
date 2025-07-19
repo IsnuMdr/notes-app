@@ -1,19 +1,23 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useNotes, useDeleteNote } from '@/hooks/useNotes';
 import { NoteCard } from './NoteCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { Note } from '@/types/notes';
 import DialogDeleteConfirmation from '../common/DialogDeleteConfirmation';
+import { Pagination } from '../ui/pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export function NoteList() {
   const router = useRouter();
-  const { data: notes, isLoading, error } = useNotes();
+  const searchParams = useSearchParams();
+  const { data, isLoading, error } = useNotes();
   const deleteNote = useDeleteNote();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
+  const { currentPage, currentLimit, handlePageChange, handleLimitChange } = usePagination();
 
   const handleEdit = (note: Note) => {
     router.push(`/notes/${note.id}/edit`);
@@ -58,10 +62,18 @@ export function NoteList() {
     );
   }
 
-  if (!notes || notes.length === 0) {
+  if (!data || data.notes.length === 0) {
+    const hasFilters =
+      searchParams.get('search') ||
+      (searchParams.get('filter') && searchParams.get('filter') !== 'all');
+
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">No notes found. Create your first note!</p>
+        <p className="text-muted-foreground">
+          {hasFilters
+            ? 'No notes found with current filters.'
+            : 'No notes found. Create your first note!'}
+        </p>
       </div>
     );
   }
@@ -69,7 +81,7 @@ export function NoteList() {
   return (
     <>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {notes.map((note) => (
+        {data.notes.map((note) => (
           <NoteCard
             key={note.id}
             note={note}
@@ -79,6 +91,17 @@ export function NoteList() {
           />
         ))}
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={data.pagination.totalPages}
+        currentLimit={currentLimit}
+        total={data.pagination.total}
+        hasNext={data.pagination.hasNext}
+        hasPrev={data.pagination.hasPrev}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
+      />
 
       <DialogDeleteConfirmation
         isOpen={deleteDialogOpen}

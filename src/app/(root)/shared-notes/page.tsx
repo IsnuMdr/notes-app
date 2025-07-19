@@ -1,13 +1,18 @@
 'use client';
 
-import { useSharedNotes } from '@/hooks/useNotes';
+import { useNotes } from '@/hooks/useNotes';
 import { NoteCard } from '@/components/notes/NoteCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
+import { Pagination } from '@/components/ui/pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export default function SharedNotesPage() {
   const router = useRouter();
-  const { data: notes, isLoading, error } = useSharedNotes();
+  const { data, isLoading, error } = useNotes({
+    filter: 'shared',
+  });
+  const { currentPage, currentLimit, handlePageChange, handleLimitChange } = usePagination();
 
   const handleView = (id: string) => {
     router.push(`/notes/${id}`);
@@ -41,21 +46,42 @@ export default function SharedNotesPage() {
     );
   }
 
+  if (!data || data.notes.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">
+          No shared notes available. Check back later or create your own notes!
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">Shared Notes</h1>
 
-      {!notes || notes.length === 0 ? (
+      {!data.notes || data.notes.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-muted-foreground">No shared notes available.</p>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {notes.map((note) => (
+          {data.notes.map((note) => (
             <NoteCard key={note.id} note={note} onView={handleView} />
           ))}
         </div>
       )}
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={data.pagination.totalPages}
+        currentLimit={currentLimit}
+        total={data.pagination.total}
+        hasNext={data.pagination.hasNext}
+        hasPrev={data.pagination.hasPrev}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
+      />
     </div>
   );
 }

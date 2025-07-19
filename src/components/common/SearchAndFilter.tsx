@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { usePagination } from '@/hooks/usePagination';
 import { Search, Filter, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,52 +16,29 @@ import {
 import { Badge } from '@/components/ui/badge';
 
 export function SearchAndFilter() {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { updateUrl } = usePagination();
 
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [filter, setFilter] = useState(searchParams.get('filter') || 'all');
 
-  const updateUrl = (newSearch: string, newFilter: string) => {
-    const params = new URLSearchParams();
-
-    if (newSearch) params.set('search', newSearch);
-    if (newFilter && newFilter !== 'all') params.set('filter', newFilter);
-
-    const queryString = params.toString();
-    const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
-
-    router.push(newUrl);
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-  };
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateUrl(search, filter);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      updateUrl(search, filter);
-    }
+    updateUrl({ search, page: 1 });
   };
 
   const handleFilterChange = (value: string) => {
     setFilter(value);
-    updateUrl(search, value);
+    updateUrl({ filter: value === 'all' ? '' : value, page: 1 });
   };
 
   const clearFilters = () => {
     setSearch('');
     setFilter('all');
-    router.push(pathname);
+    updateUrl({ search: '', filter: '', page: 1 });
   };
 
+  // Sync with URL changes
   useEffect(() => {
     setSearch(searchParams.get('search') || '');
     setFilter(searchParams.get('filter') || 'all');
@@ -71,18 +49,16 @@ export function SearchAndFilter() {
   return (
     <div className="space-y-4">
       <div className="flex gap-4">
-        {/* Search */}
         <form onSubmit={handleSearchSubmit} className="flex-1">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search notes..."
               value={search}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              onKeyDown={handleKeyDown}
+              onChange={(e) => setSearch(e.target.value)}
               className="pl-10 pr-10"
             />
-            {search ? (
+            {search && (
               <Button
                 type="button"
                 variant="ghost"
@@ -90,25 +66,15 @@ export function SearchAndFilter() {
                 className="absolute right-1 top-1 h-8 w-8 p-0"
                 onClick={() => {
                   setSearch('');
-                  updateUrl('', filter);
+                  updateUrl({ search: '', page: 1 });
                 }}
               >
                 <X className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                size="sm"
-                className="absolute right-1 top-0.5 px-4"
-                onClick={() => updateUrl(search, filter)}
-              >
-                Search
               </Button>
             )}
           </div>
         </form>
 
-        {/* Filter */}
         <Select value={filter} onValueChange={handleFilterChange}>
           <SelectTrigger className="w-48">
             <Filter className="h-4 w-4 mr-2" />
@@ -123,7 +89,6 @@ export function SearchAndFilter() {
         </Select>
       </div>
 
-      {/* Active Filters */}
       {hasActiveFilters && (
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Active filters:</span>
@@ -136,7 +101,7 @@ export function SearchAndFilter() {
                 className="h-4 w-4 p-0 ml-1"
                 onClick={() => {
                   setSearch('');
-                  updateUrl('', filter);
+                  updateUrl({ search: '', page: 1 });
                 }}
               >
                 <X className="h-3 w-3" />
@@ -152,7 +117,7 @@ export function SearchAndFilter() {
                 className="h-4 w-4 p-0 ml-1"
                 onClick={() => {
                   setFilter('all');
-                  updateUrl(search, 'all');
+                  updateUrl({ filter: '', page: 1 });
                 }}
               >
                 <X className="h-3 w-3" />

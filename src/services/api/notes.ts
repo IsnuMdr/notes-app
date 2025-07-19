@@ -9,38 +9,36 @@ const api = axios.create({
 interface GetNotesParams {
   search?: string;
   filter?: string;
+  page?: number;
+  limit?: number;
+}
+
+interface NotesResponse {
+  notes: Note[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 export const notesApi = {
   // Get all notes
-  getNotes: async (params: GetNotesParams = {}): Promise<Note[]> => {
+  getNotes: async (params: GetNotesParams = {}): Promise<NotesResponse> => {
     const searchParams = new URLSearchParams();
 
     if (params.search) searchParams.append('search', params.search);
     if (params.filter && params.filter !== 'all') searchParams.append('filter', params.filter);
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
 
     const queryString = searchParams.toString();
     const url = queryString ? `/notes?${queryString}` : '/notes';
 
     const response = await api.get(url);
-    return response.data;
-  },
-
-  // Get my notes
-  getMyNotes: async (): Promise<Note[]> => {
-    const response = await api.get('/notes?filter=my');
-    return response.data;
-  },
-
-  // Get public notes
-  getPublicNotes: async (): Promise<Note[]> => {
-    const response = await api.get('/notes?public=true');
-    return response.data;
-  },
-
-  // Get shared notes
-  getSharedNotes: async (): Promise<Note[]> => {
-    const response = await api.get('/notes?shared=true');
     return response.data;
   },
 

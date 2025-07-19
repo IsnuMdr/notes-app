@@ -16,6 +16,9 @@ export async function GET(request: NextRequest) {
   const isShared = searchParams.get('shared') === 'true';
   const search = searchParams.get('search');
   const filter = searchParams.get('filter') || 'all';
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '10');
+  const skip = (page - 1) * limit;
 
   try {
     let whereCondition: Prisma.NoteWhereInput = {};
@@ -55,32 +58,43 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    const notes = await prisma.note.findMany({
-      where: whereCondition,
-      include: {
-        author: {
-          select: { id: true, username: true, email: true },
-        },
-        comments: {
-          include: {
-            author: {
-              select: { id: true, username: true, email: true },
+    const [notes, total] = await Promise.all([
+      prisma.note.findMany({
+        where: whereCondition,
+        include: {
+          author: { select: { id: true, username: true, email: true } },
+          comments: {
+            include: {
+              author: { select: { id: true, username: true, email: true } },
             },
+            orderBy: { createdAt: 'desc' },
           },
-          orderBy: { createdAt: 'desc' },
-        },
-        shares: {
-          include: {
-            sharedWith: {
-              select: { id: true, username: true, email: true },
+          shares: {
+            include: {
+              sharedWith: { select: { id: true, username: true, email: true } },
             },
           },
         },
-      },
-      orderBy: { updatedAt: 'desc' },
-    });
+        orderBy: { updatedAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.note.count({ where: whereCondition }),
+    ]);
 
-    return NextResponse.json(notes);
+    const totalPages = Math.ceil(total / limit);
+
+    return NextResponse.json({
+      notes,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    });
   } catch (error) {
     console.error('Notes fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch notes' }, { status: 500 });

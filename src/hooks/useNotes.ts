@@ -4,35 +4,35 @@ import { CreateNoteRequest, UpdateNoteRequest, ShareNoteRequest } from '@/types/
 import { toast } from 'sonner';
 import { useSearchParams } from 'next/navigation';
 
-export function useNotes() {
+export function useNotes({
+  search = '',
+  filter = 'all',
+  page = 1,
+  limit = 12,
+}: {
+  search?: string;
+  filter?: string;
+  page?: number;
+  limit?: number;
+} = {}) {
+  // Use search params from the URL to get current search, filter, page, and limit
   const searchParams = useSearchParams();
-  const search = searchParams.get('search') || '';
-  const filter = searchParams.get('filter') || 'all'; // all, my, shared, public
+  if (!search) {
+    search = searchParams.get('search') || '';
+  }
+  if (!filter) {
+    filter = searchParams.get('filter') || 'all';
+  }
+  if (!page) {
+    page = parseInt(searchParams.get('page') || '1');
+  }
+  if (!limit) {
+    limit = parseInt(searchParams.get('limit') || '12');
+  }
 
   return useQuery({
-    queryKey: ['notes', { search, filter }],
-    queryFn: () => notesApi.getNotes({ search, filter }),
-  });
-}
-
-export function useMyNotes() {
-  return useQuery({
-    queryKey: ['notes', 'my'],
-    queryFn: notesApi.getMyNotes,
-  });
-}
-
-export function usePublicNotes() {
-  return useQuery({
-    queryKey: ['notes', 'public'],
-    queryFn: notesApi.getPublicNotes,
-  });
-}
-
-export function useSharedNotes() {
-  return useQuery({
-    queryKey: ['notes', 'shared'],
-    queryFn: notesApi.getSharedNotes,
+    queryKey: ['notes', { search, filter, page, limit }],
+    queryFn: () => notesApi.getNotes({ search, filter, page, limit }),
   });
 }
 
