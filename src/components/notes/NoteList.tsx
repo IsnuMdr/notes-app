@@ -32,7 +32,7 @@ export function NoteList({ notes, pagination, searchParams }: NoteListProps) {
   return (
     <div className="space-y-6">
       {/* Notes Grid */}
-      <div className={`grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6`}>
+      <div className={`grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3`}>
         {notes.map((note) => (
           <NoteCard
             key={note.id}
