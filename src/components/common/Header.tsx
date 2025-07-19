@@ -32,7 +32,7 @@ export function Header() {
             {session && (
               <nav className="flex items-center space-x-4">
                 <Button variant="ghost" asChild>
-                  <Link href="/">
+                  <Link href="/my-notes">
                     <FileText className="h-4 w-4 mr-2" />
                     My Notes
                   </Link>
@@ -41,6 +41,12 @@ export function Header() {
                   <Link href="/public-notes">
                     <Globe className="h-4 w-4 mr-2" />
                     Public Notes
+                  </Link>
+                </Button>
+                <Button variant="ghost" asChild>
+                  <Link href="/shared-notes">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Shared Notes
                   </Link>
                 </Button>
               </nav>

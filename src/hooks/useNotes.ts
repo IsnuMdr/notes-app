@@ -2,11 +2,23 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notesApi } from '@/services/api/notes';
 import { CreateNoteRequest, UpdateNoteRequest, ShareNoteRequest } from '@/types/notes';
 import { toast } from 'sonner';
+import { useSearchParams } from 'next/navigation';
 
 export function useNotes() {
+  const searchParams = useSearchParams();
+  const search = searchParams.get('search') || '';
+  const filter = searchParams.get('filter') || 'all'; // all, my, shared, public
+
   return useQuery({
-    queryKey: ['notes'],
-    queryFn: notesApi.getNotes,
+    queryKey: ['notes', { search, filter }],
+    queryFn: () => notesApi.getNotes({ search, filter }),
+  });
+}
+
+export function useMyNotes() {
+  return useQuery({
+    queryKey: ['notes', 'my'],
+    queryFn: notesApi.getMyNotes,
   });
 }
 
@@ -14,6 +26,13 @@ export function usePublicNotes() {
   return useQuery({
     queryKey: ['notes', 'public'],
     queryFn: notesApi.getPublicNotes,
+  });
+}
+
+export function useSharedNotes() {
+  return useQuery({
+    queryKey: ['notes', 'shared'],
+    queryFn: notesApi.getSharedNotes,
   });
 }
 

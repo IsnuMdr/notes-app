@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { noteSchema } from '@/lib/validations';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -12,17 +13,50 @@ export async function GET(request: NextRequest) {
 
   const searchParams = request.nextUrl.searchParams;
   const isPublic = searchParams.get('public') === 'true';
+  const isShared = searchParams.get('shared') === 'true';
+  const search = searchParams.get('search');
+  const filter = searchParams.get('filter') || 'all';
 
   try {
+    let whereCondition: Prisma.NoteWhereInput = {};
+
+    if (isPublic) {
+      whereCondition = { isPublic: true };
+    } else if (isShared) {
+      whereCondition = {
+        shares: { some: { sharedWithId: session.user.id } },
+      };
+    } else {
+      if (filter === 'my') {
+        whereCondition = { authorId: session.user.id };
+      } else if (filter === 'shared') {
+        whereCondition = {
+          shares: { some: { sharedWithId: session.user.id } },
+        };
+      } else if (filter === 'public') {
+        whereCondition = { isPublic: true };
+      } else {
+        whereCondition = {
+          OR: [{ authorId: session.user.id }, { isPublic: true }],
+        };
+      }
+    }
+
+    if (search) {
+      const searchCondition = {
+        OR: [
+          { title: { contains: search, mode: 'insensitive' as const } },
+          { content: { contains: search, mode: 'insensitive' as const } },
+        ],
+      };
+
+      whereCondition = {
+        AND: [whereCondition, searchCondition],
+      };
+    }
+
     const notes = await prisma.note.findMany({
-      where: isPublic
-        ? { isPublic: true }
-        : {
-            OR: [
-              { authorId: session.user.id },
-              { shares: { some: { sharedWithId: session.user.id } } },
-            ],
-          },
+      where: whereCondition,
       include: {
         author: {
           select: { id: true, username: true, email: true },
@@ -48,7 +82,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(notes);
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    console.error('Notes fetch error:', error);
+    return NextResponse.json({ error: 'Failed to fetch notes' }, { status: 500 });
   }
 }
 

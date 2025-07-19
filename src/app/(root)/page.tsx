@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { SearchBar } from '@/components/search/SearchBar';
 import { NoteList } from '@/components/notes/NoteLists';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { SearchAndFilter } from '@/components/common/SearchAndFilter';
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -29,8 +29,8 @@ export default async function DashboardPage() {
         </Button>
       </div>
 
-      <div className="space-y-8">
-        <SearchBar />
+      <div className="space-y-6">
+        <SearchAndFilter />
         <NoteList />
       </div>
     </div>

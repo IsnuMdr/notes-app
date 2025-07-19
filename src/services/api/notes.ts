@@ -6,16 +6,41 @@ const api = axios.create({
   timeout: 10000, // Set a timeout for requests
 });
 
+interface GetNotesParams {
+  search?: string;
+  filter?: string;
+}
+
 export const notesApi = {
-  // Get all notes (private + shared)
-  getNotes: async (): Promise<Note[]> => {
-    const response = await api.get('/notes');
+  // Get all notes
+  getNotes: async (params: GetNotesParams = {}): Promise<Note[]> => {
+    const searchParams = new URLSearchParams();
+
+    if (params.search) searchParams.append('search', params.search);
+    if (params.filter && params.filter !== 'all') searchParams.append('filter', params.filter);
+
+    const queryString = searchParams.toString();
+    const url = queryString ? `/notes?${queryString}` : '/notes';
+
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  // Get my notes
+  getMyNotes: async (): Promise<Note[]> => {
+    const response = await api.get('/notes?filter=my');
     return response.data;
   },
 
   // Get public notes
   getPublicNotes: async (): Promise<Note[]> => {
     const response = await api.get('/notes?public=true');
+    return response.data;
+  },
+
+  // Get shared notes
+  getSharedNotes: async (): Promise<Note[]> => {
+    const response = await api.get('/notes?shared=true');
     return response.data;
   },
 
