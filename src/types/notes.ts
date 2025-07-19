@@ -1,5 +1,17 @@
 import { Comment } from './comments';
 
+export interface NotesResponse {
+  notes: Note[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
 export interface Note {
   id: string;
   title: string;
@@ -8,13 +20,13 @@ export interface Note {
   createdAt: Date;
   updatedAt: Date;
   authorId: string;
-  author: {
+  author?: {
     id: string;
     username: string;
     email: string;
   };
-  comments: Comment[];
-  shares: NoteShare[];
+  comments?: Comment[];
+  shares?: NoteShare[];
 }
 
 export interface NoteShare {
@@ -45,4 +57,11 @@ export interface UpdateNoteRequest {
 export interface ShareNoteRequest {
   noteId: string;
   email: string;
+}
+
+export interface SearchParams {
+  search?: string;
+  filter?: string;
+  page?: string;
+  limit?: string;
 }

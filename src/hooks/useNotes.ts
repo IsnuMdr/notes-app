@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notesApi } from '@/services/api/notes';
 import { CreateNoteRequest, UpdateNoteRequest, ShareNoteRequest } from '@/types/notes';
 import { toast } from 'sonner';
-import { useSearchParams } from 'next/navigation';
 
 export function useNotes({
   search = '',
@@ -15,21 +14,6 @@ export function useNotes({
   page?: number;
   limit?: number;
 } = {}) {
-  // Use search params from the URL to get current search, filter, page, and limit
-  const searchParams = useSearchParams();
-  if (!search) {
-    search = searchParams.get('search') || '';
-  }
-  if (!filter) {
-    filter = searchParams.get('filter') || 'all';
-  }
-  if (!page) {
-    page = parseInt(searchParams.get('page') || '1');
-  }
-  if (!limit) {
-    limit = parseInt(searchParams.get('limit') || '12');
-  }
-
   return useQuery({
     queryKey: ['notes', { search, filter, page, limit }],
     queryFn: () => notesApi.getNotes({ search, filter, page, limit }),

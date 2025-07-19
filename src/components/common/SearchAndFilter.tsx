@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { usePagination } from '@/hooks/usePagination';
+import { useState, useTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Filter, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,34 +14,66 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 
-export function SearchAndFilter() {
+interface SearchAndFilterProps {
+  showFilterOptions?: boolean;
+  filterOptions?: Array<{ value: string; label: string }>;
+}
+
+export function SearchAndFilter({
+  showFilterOptions = true,
+  filterOptions = [
+    { value: 'all', label: 'All Notes' },
+    { value: 'my', label: 'My Notes' },
+    { value: 'shared', label: 'Shared with Me' },
+    { value: 'public', label: 'Public Notes' },
+  ],
+}: SearchAndFilterProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const { updateUrl } = usePagination();
+  const [isPending, startTransition] = useTransition();
 
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [filter, setFilter] = useState(searchParams.get('filter') || 'all');
 
+  const updateUrl = (updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value && value !== 'all') {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+
+    // Always reset to page 1 when searching/filtering
+    params.set('page', '1');
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `?${queryString}` : '?';
+
+    startTransition(() => {
+      router.push(newUrl);
+    });
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateUrl({ search, page: 1 });
+    updateUrl({ search, filter });
   };
 
   const handleFilterChange = (value: string) => {
     setFilter(value);
-    updateUrl({ filter: value === 'all' ? '' : value, page: 1 });
+    updateUrl({ search, filter: value });
   };
 
   const clearFilters = () => {
     setSearch('');
     setFilter('all');
-    updateUrl({ search: '', filter: '', page: 1 });
+    startTransition(() => {
+      router.push('?');
+    });
   };
-
-  // Sync with URL changes
-  useEffect(() => {
-    setSearch(searchParams.get('search') || '');
-    setFilter(searchParams.get('filter') || 'all');
-  }, [searchParams]);
 
   const hasActiveFilters = search || (filter && filter !== 'all');
 
@@ -57,6 +88,7 @@ export function SearchAndFilter() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 pr-10"
+              disabled={isPending}
             />
             {search && (
               <Button
@@ -66,8 +98,9 @@ export function SearchAndFilter() {
                 className="absolute right-1 top-1 h-8 w-8 p-0"
                 onClick={() => {
                   setSearch('');
-                  updateUrl({ search: '', page: 1 });
+                  updateUrl({ search: '', filter });
                 }}
+                disabled={isPending}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -75,18 +108,21 @@ export function SearchAndFilter() {
           </div>
         </form>
 
-        <Select value={filter} onValueChange={handleFilterChange}>
-          <SelectTrigger className="w-48">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Notes</SelectItem>
-            <SelectItem value="my">My Notes</SelectItem>
-            <SelectItem value="shared">Shared with Me</SelectItem>
-            <SelectItem value="public">Public Notes</SelectItem>
-          </SelectContent>
-        </Select>
+        {showFilterOptions && (
+          <Select value={filter} onValueChange={handleFilterChange} disabled={isPending}>
+            <SelectTrigger className="w-48">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {filterOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       {hasActiveFilters && (
@@ -101,8 +137,9 @@ export function SearchAndFilter() {
                 className="h-4 w-4 p-0 ml-1"
                 onClick={() => {
                   setSearch('');
-                  updateUrl({ search: '', page: 1 });
+                  updateUrl({ search: '', filter });
                 }}
+                disabled={isPending}
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -110,25 +147,36 @@ export function SearchAndFilter() {
           )}
           {filter && filter !== 'all' && (
             <Badge variant="secondary">
-              Filter: {filter}
+              Filter: {filterOptions.find((opt) => opt.value === filter)?.label}
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-4 w-4 p-0 ml-1"
                 onClick={() => {
                   setFilter('all');
-                  updateUrl({ filter: '', page: 1 });
+                  updateUrl({ search, filter: 'all' });
                 }}
+                disabled={isPending}
               >
                 <X className="h-3 w-3" />
               </Button>
             </Badge>
           )}
-          <Button variant="outline" size="sm" onClick={clearFilters}>
+          <Button variant="outline" size="sm" onClick={clearFilters} disabled={isPending}>
             Clear all
           </Button>
         </div>
       )}
+
+      {isPending && <LoadingOverlay />}
+    </div>
+  );
+}
+
+function LoadingOverlay() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-black"></div>
     </div>
   );
 }

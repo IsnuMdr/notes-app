@@ -1,37 +1,49 @@
-'use client';
-
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import LimitSelector from './LimitSelector';
 
-interface PaginationProps {
+interface ServerPaginationProps {
   currentPage: number;
   totalPages: number;
   currentLimit: number;
   total: number;
-  onPageChange: (page: number) => void;
-  onLimitChange: (limit: number) => void;
   hasNext: boolean;
   hasPrev: boolean;
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export function Pagination({
   currentPage,
   totalPages,
-  currentLimit,
+  currentLimit = 12,
   total,
-  onPageChange,
-  onLimitChange,
   hasNext,
   hasPrev,
-}: PaginationProps) {
-  const limitOptions = [3, 6, 12, 24, 48];
+  searchParams,
+}: ServerPaginationProps) {
+  // Create URL with updated params
+  const createUrl = (updates: Record<string, string | number>) => {
+    const params = new URLSearchParams();
+
+    // Preserve existing params
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value && !updates.hasOwnProperty(key)) {
+        params.set(key, Array.isArray(value) ? value[0] : value);
+      }
+    });
+
+    // Apply updates
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value.toString());
+      } else {
+        params.delete(key);
+      }
+    });
+
+    return `?${params.toString()}`;
+  };
 
   const generatePageNumbers = () => {
     const pages = [];
@@ -72,10 +84,8 @@ export function Pagination({
   const startItem = (currentPage - 1) * currentLimit + 1;
   const endItem = Math.min(currentPage * currentLimit, total);
 
-  // if (totalPages <= 1 && total <= Math.min(...limitOptions)) return null;
-
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-3">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
       {/* Results Info & Limit Selector */}
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <span>
@@ -83,21 +93,7 @@ export function Pagination({
         </span>
         <div className="flex items-center gap-2">
           <span>Show:</span>
-          <Select
-            value={currentLimit.toString()}
-            onValueChange={(value) => onLimitChange(parseInt(value))}
-          >
-            <SelectTrigger className="w-20 h-8">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {limitOptions.map((limit) => (
-                <SelectItem key={limit} value={limit.toString()}>
-                  {limit}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <LimitSelector currentLimit={currentLimit} searchParams={searchParams} />
           <span>per page</span>
         </div>
       </div>
@@ -105,14 +101,11 @@ export function Pagination({
       {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={!hasPrev}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <span className="hidden sm:inline ml-1">Previous</span>
+          <Button variant="outline" size="sm" asChild disabled={!hasPrev}>
+            <Link href={createUrl({ page: currentPage - 1 })}>
+              <ChevronLeft className="h-4 w-4" />
+              <span className="hidden sm:inline ml-1">Previous</span>
+            </Link>
           </Button>
 
           <div className="flex items-center space-x-1">
@@ -121,23 +114,26 @@ export function Pagination({
                 key={index}
                 variant={page === currentPage ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => typeof page === 'number' && onPageChange(page)}
+                asChild={typeof page === 'number'}
                 disabled={page === '...'}
                 className="min-w-[36px] h-8"
               >
-                {page === '...' ? <MoreHorizontal className="h-4 w-4" /> : page}
+                {typeof page === 'number' ? (
+                  <Link href={createUrl({ page })}>{page}</Link>
+                ) : (
+                  <span>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </span>
+                )}
               </Button>
             ))}
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={!hasNext}
-          >
-            <span className="hidden sm:inline mr-1">Next</span>
-            <ChevronRight className="h-4 w-4" />
+          <Button variant="outline" size="sm" asChild disabled={!hasNext}>
+            <Link href={createUrl({ page: currentPage + 1 })}>
+              <span className="hidden sm:inline mr-1">Next</span>
+              <ChevronRight className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
       )}
