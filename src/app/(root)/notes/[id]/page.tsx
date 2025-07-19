@@ -71,7 +71,7 @@ export default function NoteDetailPage() {
               <div className="flex-1">
                 <CardTitle className="text-2xl mb-2">{note.title}</CardTitle>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>by {note.author.username}</span>
+                  <span>by {note?.author?.username}</span>
                   <span>•</span>
                   <span>{formatDistanceToNow(new Date(note.createdAt), { addSuffix: true })}</span>
                   {note.updatedAt !== note.createdAt && (
@@ -108,7 +108,7 @@ export default function NoteDetailPage() {
               <p className="whitespace-pre-wrap">{note.content}</p>
             </div>
 
-            {note.shares.length > 0 && (
+            {note.shares && note.shares.length > 0 && (
               <div className="mt-6">
                 <Separator className="mb-4" />
                 <div>
@@ -127,7 +127,9 @@ export default function NoteDetailPage() {
         </Card>
 
         <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-4">Comments ({note.comments.length})</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            Comments ({note.comments && note.comments.length})
+          </h3>
 
           <div className="space-y-6">
             <CommentForm noteId={note.id} />
