@@ -4,9 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { noteSchema } from '@/lib/validations';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const nodeId = await params;
-  const { id } = nodeId;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -58,7 +57,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -67,7 +68,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   try {
     const note = await prisma.note.findFirst({
       where: {
-        id: params.id,
+        id: id,
         authorId: session.user.id,
       },
     });
@@ -80,7 +81,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const validatedData = noteSchema.parse(body);
 
     const updatedNote = await prisma.note.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
       include: {
         author: {
@@ -113,7 +114,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -122,7 +128,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const note = await prisma.note.findFirst({
       where: {
-        id: params.id,
+        id,
         authorId: session.user.id,
       },
     });
@@ -132,7 +138,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     await prisma.note.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Note deleted successfully' });
