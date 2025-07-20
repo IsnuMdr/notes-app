@@ -2,7 +2,7 @@
 
 > A modern, collaborative note-taking platform built with Next.js, featuring real-time sharing, rich text editing, and seamless user experience.
 
-[![Next.js](https://img.shields.io/badge/Next.js-13+-black?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-blue?logo=nextdotjs)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.0+-2D3748?logo=prisma)](https://www.prisma.io/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind-3.0+-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
@@ -38,15 +38,12 @@
 ### 🎨 **User Experience**
 
 - **Fully responsive** design (mobile, tablet, desktop)
-- **Dark/Light mode** support
 - **Loading states** and smooth transitions
 - **Keyboard shortcuts** for power users
-- **Accessibility** compliance (WCAG 2.1)
 
 ### 🚀 **Performance & SEO**
 
 - **Server-Side Rendering** (SSR) for optimal SEO
-- **Static Site Generation** (SSG) where applicable
 - **Image optimization** and lazy loading
 - **Code splitting** and bundle optimization
 - **Caching strategies** with React Query
