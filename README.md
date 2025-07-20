@@ -13,7 +13,6 @@
 ### 🔐 **Authentication & Security**
 
 - Secure user registration and login
-- Password strength validation with visual indicator
 - Session management with NextAuth.js
 - Password visibility toggle
 - Protected routes and API endpoints
@@ -71,16 +70,10 @@
 - **[React Hook Form](https://react-hook-form.com/)** - Form handling
 - **[Zod](https://zod.dev/)** - Schema validation
 
-### **Rich Text Editing**
-
-- **[Tiptap](https://tiptap.dev/)** - Headless rich text editor
-- **[DOMPurify](https://github.com/cure53/DOMPurify)** - HTML sanitization
-
 ### **Development Tools**
 
 - **[ESLint](https://eslint.org/)** - Code linting
 - **[Prettier](https://prettier.io/)** - Code formatting
-- **[Husky](https://typicode.github.io/husky/)** - Git hooks (optional)
 
 ## 🚀 Quick Start
 
@@ -148,7 +141,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ```
 prisma/                           # Database schema
 src/
-├── app/                          # Next.js 13+ App Router
+├── app/                          # Next.js 15 App Router
 │   ├── (auth)/                   # Authentication pages
 │   │   ├── login/page.tsx
 │   │   └── register/page.tsx
