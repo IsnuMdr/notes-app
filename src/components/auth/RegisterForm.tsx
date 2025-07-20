@@ -18,11 +18,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useLoading } from '@/providers/LoadingProvider';
+import { Lock, Mail, User } from 'lucide-react';
+import { PasswordInput } from '../ui/password-input';
 
 type RegisterFormData = {
-  username: string;
+  fullname: string;
   email: string;
   password: string;
+  confirmPassword: string;
 };
 
 export function RegisterForm() {
@@ -32,11 +35,15 @@ export function RegisterForm() {
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: '',
+      fullname: '',
       email: '',
       password: '',
+      confirmPassword: '',
     },
   });
+
+  const password = form.watch('password');
+  const confirmPassword = form.watch('confirmPassword');
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -70,12 +77,21 @@ export function RegisterForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="username"
+              name="fullname"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your username" {...field} />
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Choose a fullname"
+                        className="pl-10"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        autoComplete="fullname"
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -88,7 +104,16 @@ export function RegisterForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Enter your email"
+                        className="pl-10"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        autoComplete="email"
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -101,8 +126,45 @@ export function RegisterForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Enter your password" {...field} />
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                      <PasswordInput
+                        placeholder="Create a password"
+                        className="pl-10"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        autoComplete="new-password"
+                      />
+                    </div>
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                      <PasswordInput
+                        placeholder="Confirm your password"
+                        className="pl-10"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        autoComplete="new-password"
+                      />
+                    </div>
+                  </FormControl>
+                  {confirmPassword && password && confirmPassword !== password && (
+                    <p className="text-sm text-red-500">Passwords don&apos;t match</p>
+                  )}
+                  {confirmPassword && password && confirmPassword === password && (
+                    <p className="text-sm text-green-500">Passwords match</p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}

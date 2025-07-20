@@ -12,7 +12,7 @@ async function main() {
     update: {},
     create: {
       email: 'john@example.com',
-      username: 'johndoe',
+      fullname: 'John Doe',
       password: hashedPassword,
     },
   });
@@ -22,7 +22,7 @@ async function main() {
     update: {},
     create: {
       email: 'jane@example.com',
-      username: 'janesmith',
+      fullname: 'Jane Smith',
       password: hashedPassword,
     },
   });

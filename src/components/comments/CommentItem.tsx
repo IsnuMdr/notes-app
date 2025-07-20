@@ -36,7 +36,7 @@ export default function CommentItem({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <span className="font-medium">{comment.author.username}</span>
+                <span className="font-medium">{comment.author.fullname}</span>
                 <span className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                 </span>

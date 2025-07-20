@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       where: { noteId },
       include: {
         author: {
-          select: { id: true, username: true, email: true },
+          select: { id: true, fullname: true, email: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       },
       include: {
         author: {
-          select: { id: true, username: true, email: true },
+          select: { id: true, fullname: true, email: true },
         },
       },
     });
@@ -111,7 +111,7 @@ export async function PUT(request: NextRequest) {
       where: { id: commentId },
       data: { content },
       include: {
-        author: { select: { id: true, username: true, email: true } },
+        author: { select: { id: true, fullname: true, email: true } },
       },
     });
 

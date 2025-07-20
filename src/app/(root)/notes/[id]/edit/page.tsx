@@ -23,6 +23,10 @@ export default function EditNotePage() {
     try {
       await updateNote.mutateAsync({ id: params.id as string, data });
       router.push(`/notes/${params.id}`);
+
+      setTimeout(() => {
+        hideLoading();
+      }, 1000);
     } catch (error) {
       hideLoading();
       console.error('Failed to update note:', error);

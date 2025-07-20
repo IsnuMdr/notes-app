@@ -24,12 +24,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
       include: {
         author: {
-          select: { id: true, username: true, email: true },
+          select: { id: true, fullname: true, email: true },
         },
         comments: {
           include: {
             author: {
-              select: { id: true, username: true, email: true },
+              select: { id: true, fullname: true, email: true },
             },
           },
           orderBy: { createdAt: 'desc' },
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         shares: {
           include: {
             sharedWith: {
-              select: { id: true, username: true, email: true },
+              select: { id: true, fullname: true, email: true },
             },
           },
         },
@@ -85,12 +85,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       data: validatedData,
       include: {
         author: {
-          select: { id: true, username: true, email: true },
+          select: { id: true, fullname: true, email: true },
         },
         comments: {
           include: {
             author: {
-              select: { id: true, username: true, email: true },
+              select: { id: true, fullname: true, email: true },
             },
           },
           orderBy: { createdAt: 'desc' },
@@ -98,7 +98,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         shares: {
           include: {
             sharedWith: {
-              select: { id: true, username: true, email: true },
+              select: { id: true, fullname: true, email: true },
             },
           },
         },

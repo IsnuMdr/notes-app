@@ -55,16 +55,16 @@ export async function getNotesServerSide(params: FetchNotesParams = {}) {
       prisma.note.findMany({
         where: whereCondition,
         include: {
-          author: { select: { id: true, username: true, email: true } },
+          author: { select: { id: true, fullname: true, email: true } },
           comments: {
             include: {
-              author: { select: { id: true, username: true, email: true } },
+              author: { select: { id: true, fullname: true, email: true } },
             },
             orderBy: { createdAt: 'desc' },
           },
           shares: {
             include: {
-              sharedWith: { select: { id: true, username: true, email: true } },
+              sharedWith: { select: { id: true, fullname: true, email: true } },
             },
           },
         },

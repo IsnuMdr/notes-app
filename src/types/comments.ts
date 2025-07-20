@@ -7,7 +7,7 @@ export interface Comment {
   authorId: string;
   author: {
     id: string;
-    username: string;
+    fullname: string;
     email: string;
   };
 }

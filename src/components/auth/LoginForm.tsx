@@ -17,6 +17,8 @@ import { toast } from 'sonner';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { useLoading } from '@/providers/LoadingProvider';
+import { Lock, Mail } from 'lucide-react';
+import { PasswordInput } from '../ui/password-input';
 
 type LoginFormData = {
   email: string;
@@ -77,7 +79,16 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        className="pl-10"
+                        placeholder="Enter your email"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        autoComplete="email"
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -90,7 +101,16 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Enter your password" {...field} />
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                      <PasswordInput
+                        placeholder="Enter your password"
+                        className="pl-10"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        autoComplete="current-password"
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

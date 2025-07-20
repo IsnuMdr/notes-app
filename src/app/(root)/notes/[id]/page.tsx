@@ -71,7 +71,7 @@ export default function NoteDetailPage() {
               <div className="flex-1">
                 <CardTitle className="text-2xl mb-2">{note.title}</CardTitle>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>by {note?.author?.username}</span>
+                  <span>by {note?.author?.fullname}</span>
                   <span>•</span>
                   <span>{formatDistanceToNow(new Date(note.createdAt), { addSuffix: true })}</span>
                   {note.updatedAt !== note.createdAt && (
@@ -116,7 +116,7 @@ export default function NoteDetailPage() {
                   <div className="flex flex-wrap gap-2">
                     {note.shares.map((share) => (
                       <Badge key={share.id} variant="outline">
-                        {share.sharedWith.username}
+                        {share.sharedWith.fullname}
                       </Badge>
                     ))}
                   </div>

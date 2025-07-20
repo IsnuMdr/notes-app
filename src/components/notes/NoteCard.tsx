@@ -109,7 +109,7 @@ export function NoteCard({ note, showActions = true, variant = 'default' }: Note
                   variant === 'compact' ? 'text-xs' : 'text-sm'
                 }`}
               >
-                by {note?.author?.username} •{' '}
+                by {note?.author?.fullname} •{' '}
                 {formatDistanceToNow(new Date(note.createdAt), { addSuffix: true })}
                 {updatedAt !== createdAt && <span className="ml-1">(edited)</span>}
               </p>

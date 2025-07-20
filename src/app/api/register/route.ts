@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [{ email: validatedData.email }, { username: validatedData.username }],
+        OR: [{ email: validatedData.email }, { fullname: validatedData.fullname }],
       },
     });
 
@@ -25,13 +25,13 @@ export async function POST(request: NextRequest) {
     // Create user
     const user = await prisma.user.create({
       data: {
-        username: validatedData.username,
+        fullname: validatedData.fullname,
         email: validatedData.email,
         password: hashedPassword,
       },
       select: {
         id: true,
-        username: true,
+        fullname: true,
         email: true,
       },
     });

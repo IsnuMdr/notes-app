@@ -22,7 +22,7 @@ export interface Note {
   authorId: string;
   author?: {
     id: string;
-    username: string;
+    fullname: string;
     email: string;
   };
   comments?: Comment[];
@@ -37,7 +37,7 @@ export interface NoteShare {
   updatedAt: Date;
   sharedWith: {
     id: string;
-    username: string;
+    fullname: string;
     email: string;
   };
 }

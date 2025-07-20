@@ -152,11 +152,11 @@ export function Header() {
                         <div className="flex items-center space-x-3 px-3 py-2">
                           <Avatar className="h-8 w-8">
                             <AvatarFallback>
-                              {session.user.username?.charAt(0).toUpperCase()}
+                              {session.user.fullname?.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col">
-                            <span className="text-sm font-medium">{session.user.username}</span>
+                            <span className="text-sm font-medium">{session.user.fullname}</span>
                             <span className="text-xs text-muted-foreground">
                               {session.user.email}
                             </span>
@@ -184,7 +184,7 @@ export function Header() {
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarFallback>
-                          {session.user.username?.charAt(0).toUpperCase()}
+                          {session.user.fullname?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -192,7 +192,7 @@ export function Header() {
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">{session.user.username}</p>
+                        <p className="font-medium">{session.user.fullname}</p>
                         <p className="w-[200px] truncate text-sm text-muted-foreground">
                           {session.user.email}
                         </p>

@@ -40,7 +40,7 @@ export default async function DashboardPage({
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {session.user.username}!</p>
+          <p className="text-muted-foreground">Welcome back, {session.user.fullname}!</p>
         </div>
         <Button asChild>
           <Link href="/notes/create">
