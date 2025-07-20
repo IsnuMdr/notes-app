@@ -5,6 +5,7 @@ import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { Header } from '@/components/common/Header';
 import { Toaster } from 'sonner';
+import { LoadingProvider } from '@/providers/LoadingProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,10 +20,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <AuthProvider>
           <QueryProvider>
-            <div className="min-h-screen bg-background">
-              <Header />
-              <main>{children}</main>
-            </div>
+            <LoadingProvider>
+              <div className="min-h-screen bg-background">
+                <Header />
+                <main>{children}</main>
+              </div>
+              <Toaster />
+            </LoadingProvider>
             <Toaster />
           </QueryProvider>
         </AuthProvider>

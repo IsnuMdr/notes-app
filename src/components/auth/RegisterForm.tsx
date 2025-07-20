@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -18,6 +17,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { useLoading } from '@/providers/LoadingProvider';
 
 type RegisterFormData = {
   username: string;
@@ -27,7 +27,7 @@ type RegisterFormData = {
 
 export function RegisterForm() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { showLoading, hideLoading } = useLoading();
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -39,11 +39,15 @@ export function RegisterForm() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setIsLoading(true);
     try {
       await axios.post('/api/register', data);
+
+      showLoading('Account created! Redirecting to login...');
       toast.success('Account created successfully! Please login.');
-      router.push('/login');
+
+      setTimeout(() => {
+        router.push('/login');
+      }, 1000);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.error || 'Registration failed');
@@ -51,7 +55,7 @@ export function RegisterForm() {
         toast.error('Registration failed');
       }
     } finally {
-      setIsLoading(false);
+      hideLoading();
     }
   };
 
@@ -103,8 +107,8 @@ export function RegisterForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Register'}
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Creating account...' : 'Register'}
             </Button>
           </form>
         </Form>

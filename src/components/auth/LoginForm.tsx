@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
+import { useLoading } from '@/providers/LoadingProvider';
 
 type LoginFormData = {
   email: string;
@@ -23,6 +24,8 @@ type LoginFormData = {
 };
 
 export function LoginForm() {
+  const { showLoading, hideLoading } = useLoading();
+
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -38,14 +41,22 @@ export function LoginForm() {
         password: data.password,
         redirect: false,
       });
+      showLoading('Signing in...');
 
       if (result?.error) {
+        hideLoading();
         toast.error('Invalid credentials');
-      } else {
+      } else if (result?.ok) {
+        showLoading('Login successful! Redirecting...');
         toast.success('Login successful');
-        window.location.href = '/';
+
+        // Small delay for better UX
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
       }
     } catch (error) {
+      hideLoading();
       toast.error(error instanceof Error ? error.message : 'Login failed');
     }
   };

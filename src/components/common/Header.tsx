@@ -15,6 +15,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, FileText, Globe, Share2, Menu } from 'lucide-react';
+import { useLoading } from '@/providers/LoadingProvider';
 
 const navigationItems = [
   {
@@ -42,8 +43,11 @@ export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleSignOut = () => {
-    signOut({ callbackUrl: '/login' });
+  const { showLoading, hideLoading } = useLoading();
+
+  const handleSignOut = async () => {
+    showLoading('Signing out...');
+    await signOut();
   };
 
   const isActive = (href: string) => {
@@ -53,13 +57,28 @@ export function Header() {
     return pathname.startsWith(href);
   };
 
+  const handleNavigation = (href: string) => {
+    showLoading();
+    if (pathname !== href) {
+      setMobileMenuOpen(false);
+    }
+
+    setTimeout(() => {
+      hideLoading();
+    }, 2000);
+  };
+
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <Link href="/" className="text-xl font-bold hover:opacity-80 transition-opacity">
+            <Link
+              href="/"
+              className="text-xl font-bold hover:opacity-80 transition-opacity"
+              onClick={() => handleNavigation('/')}
+            >
               NoteTaker
             </Link>
 
@@ -76,7 +95,7 @@ export function Header() {
                       asChild
                       className="text-sm"
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} onClick={() => handleNavigation(item.href)}>
                         <Icon className="h-4 w-4 mr-2" />
                         {item.label}
                       </Link>

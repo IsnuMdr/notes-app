@@ -55,6 +55,9 @@ export function NoteCard({ note, showActions = true, variant = 'default' }: Note
       ? note.content.substring(0, 150) + '...'
       : note.content;
 
+  const createdAt = new Date(note.createdAt).toISOString();
+  const updatedAt = new Date(note.updatedAt).toISOString();
+
   const handleEdit = () => {
     if (!isOwner) {
       toast.error('You can only edit your own notes');
@@ -108,7 +111,7 @@ export function NoteCard({ note, showActions = true, variant = 'default' }: Note
               >
                 by {note?.author?.username} •{' '}
                 {formatDistanceToNow(new Date(note.createdAt), { addSuffix: true })}
-                {note.updatedAt !== note.createdAt && <span className="ml-1">(edited)</span>}
+                {updatedAt !== createdAt && <span className="ml-1">(edited)</span>}
               </p>
             </div>
             <div className="flex items-center gap-2 ml-2">

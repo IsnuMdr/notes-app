@@ -8,19 +8,25 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { UpdateNoteRequest } from '@/types/notes';
+import { useLoading } from '@/providers/LoadingProvider';
+import { toast } from 'sonner';
 
 export default function EditNotePage() {
   const params = useParams();
   const router = useRouter();
   const { data: note, isLoading } = useNote(params.id as string);
   const updateNote = useUpdateNote();
+  const { showLoading, hideLoading } = useLoading();
 
   const handleSubmit = async (data: UpdateNoteRequest) => {
+    showLoading('Updating note...');
     try {
       await updateNote.mutateAsync({ id: params.id as string, data });
       router.push(`/notes/${params.id}`);
     } catch (error) {
-      console.error('Failed to create note:', error);
+      hideLoading();
+      console.error('Failed to update note:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to update note');
     }
   };
 
