@@ -19,7 +19,6 @@
 
 ### 📝 **Rich Note Management**
 
-- **Rich Text Editor** powered by Tiptap
 - Create, edit, delete, and organize notes
 - Auto-save functionality
 - **Search & Filter** with advanced options
@@ -177,7 +176,7 @@ src/
 ```sql
 -- Users table
 Users {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   email       String   @unique
   fullname    String
   password    String   (hashed)
@@ -241,8 +240,6 @@ npm run db:reset     # Reset database
 
 ### Note Management
 
-- ✅ **Rich Text Editor** with formatting options
-- ✅ **Auto-save** during editing
 - ✅ **Search & Filter** notes by title, content, author
 - ✅ **Pagination** for large note collections
 
@@ -340,7 +337,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 👥 Authors
 
-- **Your Name** - _Initial work_ - [@IsnuMdr](https://github.com/IsnuMdr)
+- **Isnu Munandar** - _Initial work_ - [@IsnuMdr](https://github.com/IsnuMdr)
 
 ## 🙏 Acknowledgments
 
